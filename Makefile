@@ -24,6 +24,7 @@ PATH := $(PATH):$(GOPATH)/bin
 
 # Go environment
 CURDIR := $(shell pwd)
+SRC := $(CURDIR)/vendor/src/github.com/medcl/elasticsearch-proxy
 OLDGOPATH:= $(GOPATH)
 NEWGOPATH:= $(CURDIR):$(CURDIR)/vendor:$(GOPATH)
 
@@ -38,7 +39,7 @@ MAC       := "Darwin"
 GO_FILES=$(find . -iname '*.go' | grep -v /vendor/)
 PKGS=$(go list ./... | grep -v /vendor/)
 
-FRAMEWORK_FOLDER := $(CURDIR)/../../infinitbyte/framework/
+FRAMEWORK_FOLDER := $(CURDIR)/../framework/
 FRAMEWORK_BRANCH := master
 FRAMEWORK_VENDOR_FOLDER := $(CURDIR)/vendor/
 FRAMEWORK_VENDOR_BRANCH := master
@@ -53,7 +54,7 @@ endif
 default: build
 
 build: config
-	@#echo $(GOPATH)
+	@echo $(GOPATH)
 	@echo $(NEWGOPATH)
 	$(GOBUILD) -o bin/$(APP_NAME)
 	@$(MAKE) restore-generated-file
@@ -120,23 +121,33 @@ clean: clean_data
 	mkdir bin
 
 init:
+	
 	@echo building $(APP_NAME) $(APP_VERSION)
-	@if [ ! -d $(FRAMEWORK_FOLDER) ]; then echo "framework does not exist";(cd ../&&git clone -b $(FRAMEWORK_BRANCH) https://github.com/infinitbyte/framework.git) fi
+	@if [ ! -d $(FRAMEWORK_FOLDER) ]; then echo "framework does not exist";(git clone -b $(FRAMEWORK_BRANCH) https://github.com/infinitbyte/framework.git $(FRAMEWORK_FOLDER)) fi
 	@if [ ! -d $(FRAMEWORK_VENDOR_FOLDER) ]; then echo "framework vendor does not exist";(git clone  -b $(FRAMEWORK_VENDOR_BRANCH) https://github.com/infinitbyte/framework-vendor.git vendor) fi
 	@if [ "" == $(FRAMEWORK_OFFLINE_BUILD) ]; then (cd $(FRAMEWORK_FOLDER) && git pull origin $(FRAMEWORK_BRANCH)); fi;
 	@if [ "" == $(FRAMEWORK_OFFLINE_BUILD) ]; then (cd vendor && git pull origin $(FRAMEWORK_VENDOR_BRANCH)); fi;
-
+	@echo "prepare folders"
+	mkdir -p $(SRC)
+	cp -rf $(CURDIR)/config $(SRC)
+	cp -rf $(CURDIR)/model $(SRC)
+	cp -rf $(CURDIR)/pipelines $(SRC)
+	cp -rf $(CURDIR)/plugin $(SRC)
+	cp -rf $(CURDIR)/api $(SRC)
+	cp -rf $(CURDIR)/ui $(SRC)
+	cp -rf $(CURDIR)/static $(SRC)
+	ls $(SRC)
 
 update-generated-file:
 	@echo "update generated info"
-	@echo -e "package config\n\nconst LastCommitLog = \""`git log -1 --pretty=format:"%h, %ad, %an, %s"` "\"\nconst BuildDate = \"`date`\"" > config/generated.go
-	@echo -e "\nconst Version  = \"$(APP_VERSION)\"" >> config/generated.go
+	@echo -e "package config\n\nconst LastCommitLog = \""`git log -1 --pretty=format:"%h, %ad, %an, %s"` "\"\nconst BuildDate = \"`date`\"" > $(SRC)/config/generated.go
+	@echo -e "\nconst Version  = \"$(APP_VERSION)\"" >> $(SRC)/config/generated.go
 
 
 restore-generated-file:
 	@echo "restore generated info"
-	@echo -e "package config\n\nconst LastCommitLog = \"N/A\"\nconst BuildDate = \"N/A\"" > config/generated.go
-	@echo -e "\nconst Version = \"0.0.1-SNAPSHOT\"" >> config/generated.go
+	@echo -e "package config\n\nconst LastCommitLog = \"N/A\"\nconst BuildDate = \"N/A\"" > $(SRC)/config/generated.go
+	@echo -e "\nconst Version = \"0.0.1-SNAPSHOT\"" >> $(SRC)/config/generated.go
 
 
 update-vfs:
