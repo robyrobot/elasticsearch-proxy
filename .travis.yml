@@ -11,7 +11,7 @@ before_install:
   #- go get honnef.co/go/tools/cmd/megacheck (removed because not found)
 
 script:
-  - make -s clean config build
+  - make -s clean config build > /dev/null 2>&1
   #- test -z $(gofmt -s -l $GO_FILES) # disable test for the moment
 
 go:
