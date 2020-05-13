@@ -1,6 +1,6 @@
 language: go
 os:
-- osx
+#- osx
 - linux
 
 dist: bionic
@@ -18,8 +18,8 @@ script:
   #- test -z $(gofmt -s -l $GO_FILES) # disable test for the moment
 
 go:
-- 1.8
-- 1.9
+#- 1.8
+#- 1.9
 - master
 
 deploy:
