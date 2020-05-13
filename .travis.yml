@@ -1,6 +1,6 @@
 language: go
 os:
-#- osx
+- osx
 - linux
 
 dist: bionic
@@ -13,9 +13,8 @@ before_install:
   #- go get honnef.co/go/tools/cmd/megacheck (removed because not found)
 
 script:
-  - make -s clean config build > /tmp/build.log 2>&1
-  - tail /tmp/build.log
-  #- test -z $(gofmt -s -l $GO_FILES) # disable test for the moment
+  - make -s clean config build   
+  - test -z $(gofmt -s -l $GO_FILES) # disable test for the moment
 
 go:
 #- 1.8
