@@ -1,3 +1,4 @@
+<img src="https://travis-ci.org/robyrobot/elasticsearch-proxy.svg?branch=master" />
 
 PROXY, a lightweight elasticsearch proxy written in golang.
 
